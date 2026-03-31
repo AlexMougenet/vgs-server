@@ -1,0 +1,33 @@
+## Build artifacts
+/bin/
+/obj/
+
+## Visual Studio / VS Code
+/.vs/
+.vscode/
+/.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Logs and diagnostics
+*.log
+*.dmp
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+
+## Rider / ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+## OS-specific
+Thumbs.db
+Desktop.ini
+.$*
+
+## Tool outputs / generated SDKs
+/Dumper-7/*/
