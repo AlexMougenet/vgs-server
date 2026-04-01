@@ -19,6 +19,7 @@
 *.nupkg
 *.snupkg
 packages/
+/node_modules/
 
 ## Rider / ReSharper
 _ReSharper*/

@@ -75,8 +75,8 @@ wss.on('connection', (ws) => {
     }
 
     if (msg.type === 'vgs_event') {
-      const { roomCode, playerName, playerColor, command, label, sound } = msg;
-      broadcast(roomCode, { type: 'vgs_event', playerName, playerColor, command, label, sound }, ws);
+      const { roomCode, playerName, playerColor, command, commandId, voicePackId, label, sound } = msg;
+      broadcast(roomCode, { type: 'vgs_event', playerName, playerColor, command, commandId, voicePackId, label, sound }, ws);
     }
   });
 
