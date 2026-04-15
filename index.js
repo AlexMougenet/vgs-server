@@ -3,7 +3,7 @@ const { WebSocketServer } = require('ws');
 const PORT = process.env.PORT || 3000;
 const wss = new WebSocketServer({ port: PORT });
 
-// roomCode → Set<{ ws, playerName }>
+// roomCode → Set<{ ws, playerName, playerColor, voicePack }>
 const rooms = new Map();
 
 function broadcast(roomCode, message, excludeWs) {
@@ -46,11 +46,16 @@ wss.on('connection', (ws) => {
       return;
     }
 
+    if (msg.type === 'ping') {
+      // keepalive — no-op, just prevents unhandled message noise
+      return;
+    }
+
     if (msg.type === 'join') {
-      // Remove from previous room if any
+      // Remove from previous room if any (handles reconnect without close)
       removeFromRoom(ws);
 
-      const { roomCode, playerName } = msg;
+      const { roomCode, playerName, playerColor, voicePack } = msg;
       currentRoom = roomCode;
       currentName = playerName;
 
@@ -58,19 +63,19 @@ wss.on('connection', (ws) => {
         rooms.set(roomCode, new Set());
       }
       const room = rooms.get(roomCode);
-      room.add({ ws, playerName });
+      room.add({ ws, playerName, playerColor: playerColor || '#7cacff', voicePack: voicePack || 'default' });
 
-      // Send current player list to the joining client
-      const players = [];
+      // Send current player list to the joining client as a name→info map
+      const players = {};
       for (const member of room) {
         if (member.ws !== ws) {
-          players.push(member.playerName);
+          players[member.playerName] = { color: member.playerColor, voicePack: member.voicePack };
         }
       }
       ws.send(JSON.stringify({ type: 'room_state', players }));
 
-      // Broadcast join to others
-      broadcast(roomCode, { type: 'player_joined', playerName }, ws);
+      // Broadcast join to others (include color + voicePack so they can display correctly)
+      broadcast(roomCode, { type: 'player_joined', playerName, playerColor: playerColor || '#7cacff', voicePack: voicePack || 'default' }, ws);
       console.log(`[${roomCode}] ${playerName} joined (${room.size} in room)`);
     }
 
